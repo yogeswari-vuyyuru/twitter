@@ -100,19 +100,88 @@ const authenticateToken = (request, response, next) => {
   }
 };
 
+// Checking that user request a tweet of the user he is following or not
+
+const checkFollowingOrNot = async (request, response, next) => {
+  const { tweetId } = request.params;
+  const { username } = request;
+  const selectUserQuery = `SELECT user_id FROM user WHERE username = '${username}';`;
+  const userId = await db.get(selectUserQuery);
+  const getFollowingQuery = `SELECT *
+    FROM tweet JOIN follower ON tweet.user_id = follower.following_user_id
+    WHERE follower.follower_user_id = ${userId.user_id};`;
+  const following = await db.all(getFollowingQuery);
+  if (following === undefined) {
+    response.status(401);
+    response.send("Invalid Request");
+  } else {
+    next();
+  }
+};
+
 // User Feed API
 
 app.get("/user/tweets/feed/", authenticateToken, async (request, response) => {
   const { username } = request;
   const selectUserQuery = `SELECT user_id FROM user WHERE username = '${username}';`;
   const userId = await db.get(selectUserQuery);
-  console.log(userId);
-  const getFeedQuery = `SELECT user.username, tweet.tweet, tweet.date_time
+  const getFeedQuery = `SELECT user.username, tweet.tweet, tweet.date_time 
         FROM (user JOIN follower ON user.user_id = follower.following_user_id) AS T
         JOIN tweet ON T.user_id = tweet.user_id
-        WHERE follower.follower_user_id = ${userId}
+        WHERE T.follower_user_id = ${userId.user_id}
         ORDER BY tweet.date_time DESC
         LIMIT 4;`;
   const feed = await db.all(getFeedQuery);
   response.send(feed);
 });
+
+// User following names API
+
+app.get("/user/following/", authenticateToken, async (request, response) => {
+  const { username } = request;
+  const selectUserQuery = `SELECT user_id FROM user WHERE username = '${username}';`;
+  const userId = await db.get(selectUserQuery);
+  const getFollowingQuery = `SELECT user.name 
+    FROM user JOIN follower ON user.user_id = follower.following_user_id
+    WHERE follower.follower_user_id = ${userId.user_id};`;
+  const following = await db.all(getFollowingQuery);
+  response.send(following);
+});
+
+// User followers names API
+
+app.get("/user/followers/", authenticateToken, async (request, response) => {
+  const { username } = request;
+  const selectUserQuery = `SELECT user_id FROM user WHERE username = '${username}';`;
+  const userId = await db.get(selectUserQuery);
+  const getFollowersQuery = `SELECT user.name 
+    FROM user JOIN follower ON user.user_id = follower.follower_user_id
+    WHERE follower.following_user_id = ${userId.user_id};`;
+  const followers = await db.all(getFollowersQuery);
+  response.send(followers);
+});
+
+// Tweet details API
+
+app.get(
+  "/tweet/:tweetId/",
+  authenticateToken,
+  checkFollowingOrNot,
+  async (request, response) => {
+    const { tweetId } = request.params;
+    const tweetDetailsQuery = `SELECT DISTINCT tweet.tweet, COUNT(like.like_id),
+        COUNT(reply.reply_id), tweet.date_time
+        FROM (tweet LEFT JOIN reply ON tweet.tweet_id = reply.tweet_id) AS T
+        RIGHT JOIN like ON tweet.tweet_id = like.tweet_id
+        WHERE tweet.tweet_id = ${tweetId};`;
+    const tweetDetails = await db.get(tweetDetailsQuery);
+    response.send({
+      tweet: tweetDetails.tweet,
+      likes: tweetDetails["COUNT(like.like_id)"],
+      replies: tweetDetails["COUNT(reply.reply_id)"],
+      dateTime: tweetDetails["date_time"],
+    });
+  }
+);
+
+module.exports = app;
