@@ -37,3 +37,31 @@ GET http://localhost:3000/tweet/2
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkpvZUJpZGVuIiwiaWF0IjoxNjQ2NzYxMzY2fQ.br5_yRLLai2ZDwoGdVANJnHQeOimtmKJa9mcwkzMT2Q
 
 ###
+GET http://localhost:3000/tweets/2/likes/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkpvZUJpZGVuIiwiaWF0IjoxNjQ2NzYxMzY2fQ.br5_yRLLai2ZDwoGdVANJnHQeOimtmKJa9mcwkzMT2Q
+
+###
+
+GET http://localhost:3000/tweets/2/replies/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkpvZUJpZGVuIiwiaWF0IjoxNjQ2NzYxMzY2fQ.br5_yRLLai2ZDwoGdVANJnHQeOimtmKJa9mcwkzMT2Q
+
+###
+
+GET http://localhost:3000/user/tweets/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkpvZUJpZGVuIiwiaWF0IjoxNjQ2NzYxMzY2fQ.br5_yRLLai2ZDwoGdVANJnHQeOimtmKJa9mcwkzMT2Q
+
+###
+
+POST http://localhost:3000/user/tweets/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkpvZUJpZGVuIiwiaWF0IjoxNjQ2NzYxMzY2fQ.br5_yRLLai2ZDwoGdVANJnHQeOimtmKJa9mcwkzMT2Q
+Content-Type: application/json
+
+{
+    "tweet": "In 2021, the information is new OIL. But in 2022, the OIL is always OIL"
+}
+
+###
+DELETE http://localhost:3000/tweets/7/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkpvZUJpZGVuIiwiaWF0IjoxNjQ2NzYxMzY2fQ.br5_yRLLai2ZDwoGdVANJnHQeOimtmKJa9mcwkzMT2Q
+
+###
